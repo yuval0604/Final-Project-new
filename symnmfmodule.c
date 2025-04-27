@@ -82,6 +82,7 @@ static PyObject* py_sym(PyObject* self, PyObject* args) {
     double** result;
     int n, d;
     PyObject* output;
+    (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
 
@@ -117,6 +118,7 @@ static PyObject* py_ddg(PyObject* self, PyObject* args) {
     double** result;
     int n, d;
     PyObject* output;
+    (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
 
@@ -159,6 +161,7 @@ static PyObject* py_norm(PyObject* self, PyObject* args) {
     double** result;
     int n, d;
     PyObject* output;
+    (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
 
@@ -200,6 +203,8 @@ static PyObject* py_symnmf(PyObject* self, PyObject* args) {
     int n, k;
     int save_dim;
     PyObject* output;
+    (void)self;
+
     if (!PyArg_ParseTuple(args, "OO", &py_H, &py_W)) {return NULL;}
     H = pylist_to_cmatrix(py_H, &n, &k);
     if (H == NULL) {
@@ -243,7 +248,11 @@ static struct PyModuleDef symnmfmodule = {
     "symnmf",
     NULL,
     -1,
-    symnmfMethods
+    symnmfMethods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 PyMODINIT_FUNC PyInit_symnmf(void) {
