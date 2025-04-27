@@ -89,12 +89,13 @@ output: similarity matrix
 */
 double** calculate_similarity_matrix(double** data, int n, int dim) {
     double** A = allocate_matrix(n, n);
+    int i, j;
+    double dist;
     if (A == NULL) {
         printf("An Error Has Occurred\n");
         exit(1);
     }
-    int i, j;
-    double dist;
+
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             if (i != j) {
@@ -113,12 +114,13 @@ output: diagonal matrix
 */
 double** calculate_diagonal_degree_matrix(double** similarity, int n) {
     double** D = allocate_matrix(n, n);
+    int i, j;
+    double sum;
     if (D == NULL) {
         printf("An Error Has Occurred\n");
         exit(1);
     }
-    int i, j;
-    double sum;
+
     for (i = 0; i < n; i++) {
         sum = 0.0;
         for (j = 0; j < n; j++) {
@@ -137,12 +139,13 @@ output: normalized similarity matrix
 double** calculate_normalized_similarity(double** A, int n) {
     double** D = calculate_diagonal_degree_matrix(A, n);
     double** W = allocate_matrix(n, n);
+    int i, j;
     if (W == NULL) {
         free_matrix(D, n);
         printf("An Error Has Occurred\n");
         exit(1);
     }
-    int i, j;
+
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             if (D[i][i] > EPSILON && D[j][j] > EPSILON) {
@@ -222,10 +225,10 @@ double** symnmf(double** H, double** W, int n, int k) {
     double **WH, **Ht, **HHt, **HHtH;
     double** H_next = copy_matrix(H, n, k);
     for (t = 0; t < MAX_ITER; t++) {
-        double** WH = matrix_mul(W, H, n, n, k);
-        double** Ht = matrix_transpose(H, n, k);
-        double** HHt = matrix_mul(H, Ht, n, k, n);
-        double** HHtH = matrix_mul(HHt, H, n, n, k);
+        WH = matrix_mul(W, H, n, n, k);
+        Ht = matrix_transpose(H, n, k);
+        HHt = matrix_mul(H, Ht, n, k, n);
+        HHtH = matrix_mul(HHt, H, n, n, k);
         for (i = 0; i < n; i++) {
             for (j = 0; j < k; j++) {
                 numerator = WH[i][j];
