@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "symnmf.h"
 
+
 /*
 Convert a pyhton list of lists to a C matrix
 input: Python list, 2 pointers to store the number of rows and columns.
@@ -41,6 +42,7 @@ double** pylist_to_cmatrix(PyObject* py_mat, int* n_ptr, int* d_ptr) {
     return matrix;
 }
 
+
 /*
 Convert a C matrix back to a python list of lists.
 input: C Matrix, num of rows, num of columns.
@@ -71,17 +73,16 @@ PyObject* cmatrix_to_pylist(double** matrix, int n, int m) {
     return py_mat;
 }
 
+
 /*
 Computes the similarity matrix A
 input: Python object - list of lists
 output: Python object - Similarity matrix
 */
 static PyObject* py_sym(PyObject* self, PyObject* args) {
-    PyObject* py_data;
-    double** data;
-    double** result;
+    PyObject* py_data, *output;
+    double** data, **result;
     int n, d;
-    PyObject* output;
     (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
@@ -106,18 +107,16 @@ static PyObject* py_sym(PyObject* self, PyObject* args) {
     return output;
 }
 
+
 /*
 Computes the diagonal degree matrix D
 input: Python object - list of lists
 output: Python object - diagonal matrix
 */
 static PyObject* py_ddg(PyObject* self, PyObject* args) {
-    PyObject* py_data;
-    double** data;
-    double** similarity;
-    double** result;
+    PyObject* py_data, *output;
+    double** data, **similarity, **result;
     int n, d;
-    PyObject* output;
     (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
@@ -149,18 +148,17 @@ static PyObject* py_ddg(PyObject* self, PyObject* args) {
     return output;
 }
 
+
+
 /*
 Computes the normalized similarity matrix W
 input: Python object - list of lists
 output: Python object - normalized similarity matrix
 */
 static PyObject* py_norm(PyObject* self, PyObject* args) {
-    PyObject* py_data;
-    double** data;
-    double** similarity;
-    double** result;
+    PyObject* py_data, *output;
+    double** data, **similarity, **result;
     int n, d;
-    PyObject* output;
     (void)self;
 
     if (!PyArg_ParseTuple(args, "O", &py_data)) {return NULL;}
@@ -192,17 +190,16 @@ static PyObject* py_norm(PyObject* self, PyObject* args) {
     return output;
 }
 
-/* Performs full SymNMF on the normalized similarity matrix W, given an initial H
+
+/*
+Performs full SymNMF on the normalized similarity matrix W, given an initial H
 input: Python object - list of lists(H), Python object - list of lists(W) 
-output: Python object - Optimized H */
+output: Python object - Optimized H 
+*/
 static PyObject* py_symnmf(PyObject* self, PyObject* args) {
-    PyObject* py_H;
-    PyObject* py_W;
-    double** H;
-    double** W;
-    int n, k;
-    int save_dim;
-    PyObject* output;
+    PyObject* py_H, *py_W, *output;
+    double **H, **W, **H_new;
+    int n, k, save_dim;
     (void)self;
 
     if (!PyArg_ParseTuple(args, "OO", &py_H, &py_W)) {return NULL;}
@@ -223,12 +220,14 @@ static PyObject* py_symnmf(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_RuntimeError, "An Error Has Occurred");
         return NULL;
     }
-    if (symnmf(H, W, n, k) == NULL) {
+    H_new = symnmf(H, W, n, k);
+    if (H_new == NULL) {
         free_matrix(H, n);
         free_matrix(W, n);
         PyErr_SetString(PyExc_RuntimeError, "An Error Has Occurred");
         return NULL;
     }
+    H = H_new;
     output = cmatrix_to_pylist(H, n, k);
     free_matrix(H, n);
     free_matrix(W, n);
